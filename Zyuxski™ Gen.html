@@ -1,0 +1,1579 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>🎮 Zyuxski™ Generator</title>
+    <style>
+        :root {
+            --bg-primary: #0a0e17;
+            --bg-secondary: #111827;
+            --bg-card: #1e293b;
+            --border: #334155;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --accent: #6366f1;
+            --accent-glow: rgba(99, 102, 241, 0.4);
+            --success: #10b981;
+            --warning: #f59e0b;
+            --error: #ef4444;
+            --paint: #3b82f6;
+            --item: #22c55e;
+            --stamp: #a855f7;
+            --gradient-1: linear-gradient(135deg, #6366f1, #8b5cf6, #d946ef);
+            --gradient-2: linear-gradient(135deg, #3b82f6, #06b6d4);
+            --glass: rgba(30, 41, 59, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.1);
+        }
+
+        * { 
+            box-sizing: border-box; 
+            margin: 0; 
+            padding: 0; 
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-30px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+
+        @keyframes particleFloat {
+            0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(-100vh) rotate(720deg); opacity: 0; }
+        }
+
+        body { 
+            background: var(--bg-primary); 
+            color: var(--text-primary); 
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Animated Background */
+        .bg-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .bg-gradient {
+            position: absolute;
+            width: 200%;
+            height: 200%;
+            top: -50%;
+            left: -50%;
+            background: var(--gradient-1);
+            opacity: 0.08;            animation: gradientShift 20s ease infinite;
+            background-size: 50% 50%;
+        }
+
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: var(--accent);
+            border-radius: 50%;
+            opacity: 0.6;
+            animation: particleFloat 15s linear infinite;
+            box-shadow: 0 0 10px var(--accent-glow);
+        }
+
+        /* Main Container */
+        .app-container {
+            position: relative;
+            z-index: 1;
+            max-width: 700px;
+            margin: 0 auto;
+            padding: 20px;
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            padding: 24px 16px;
+            margin-bottom: 20px;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 800;
+            background: var(--gradient-1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .logo-subtitle {
+            color: var(--text-secondary);            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        /* Card Styles */
+        .card {
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 16px;
+            backdrop-filter: blur(12px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            animation: fadeIn 0.5s ease-out backwards;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 40px rgba(99, 102, 241, 0.2);
+        }
+
+        .card-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-primary);
+        }
+
+        /* Drop Zone */
+        .drop-zone {
+            border: 2px dashed var(--border);
+            border-radius: 16px;
+            padding: 32px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: rgba(99, 102, 241, 0.05);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .drop-zone::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(99, 102, 241, 0.1), transparent);
+            animation: shimmer 2s infinite;
+        }
+
+        .drop-zone:hover, .drop-zone.dragover {
+            border-color: var(--accent);
+            background: rgba(99, 102, 241, 0.15);
+            transform: scale(1.02);
+        }
+
+        .drop-zone-icon {
+            font-size: 2.5rem;
+            margin-bottom: 12px;
+            animation: float 2s ease-in-out infinite;
+        }
+
+        .drop-zone-text {
+            font-size: 1rem;
+            margin-bottom: 4px;
+        }
+
+        .drop-zone-hint {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            opacity: 0.8;
+        }
+
+        input[type="file"] { display: none; }
+
+        /* Status */
+        .status {
+            padding: 12px 16px;
+            border-radius: 12px;
+            margin-bottom: 16px;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            animation: slideIn 0.4s ease-out;
+        }
+
+        .status.waiting { 
+            background: rgba(245, 158, 11, 0.15); 
+            border: 1px solid var(--warning);
+            color: var(--warning);
+        }
+        .status.success { 
+            background: rgba(16, 185, 129, 0.15);             border: 1px solid var(--success);
+            color: var(--success);
+        }
+        .status.error { 
+            background: rgba(239, 68, 68, 0.15); 
+            border: 1px solid var(--error);
+            color: var(--error);
+        }
+
+        /* Field Styles */
+        .field-group {
+            margin-bottom: 14px;
+            padding: 16px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 14px;
+            border: 1px solid var(--border);
+            animation: fadeIn 0.4s ease-out backwards;
+        }
+
+        .field-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .field-label {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .field-type {
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .field-type.paint { background: rgba(59, 130, 246, 0.2); color: var(--paint); }
+        .field-type.item { background: rgba(34, 197, 94, 0.2); color: var(--item); }
+        .field-type.stamp { background: rgba(168, 85, 247, 0.2); color: var(--stamp); }
+        .field-type.text { background: rgba(148, 163, 184, 0.2); color: var(--text-secondary); }
+
+        .hex-tag {
+            background: var(--bg-secondary);            padding: 4px 10px;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.75rem;
+            color: var(--accent);
+            border: 1px solid var(--border);
+        }
+
+        .field-key {
+            font-family: monospace;
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            opacity: 0.8;
+        }
+
+        .field-input {
+            width: 100%;
+            padding: 12px 14px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            color: var(--text-primary);
+            font-size: 0.95rem;
+            outline: none;
+            transition: all 0.2s ease;
+        }
+
+        .field-input:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-glow);
+        }
+
+        .field-input[readonly] {
+            background: rgba(16, 185, 129, 0.1);
+            border-color: var(--success);
+            color: var(--success);
+            font-weight: 500;
+            cursor: not-allowed;
+        }
+
+        .field-input::placeholder {
+            color: var(--text-secondary);
+            opacity: 0.7;
+        }
+
+        /* Action Buttons */
+        .btn-select {
+            width: 100%;
+            padding: 10px;            margin-top: 10px;
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            transition: all 0.2s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-select::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .btn-select:hover::after {
+            left: 100%;
+        }
+
+        .btn-select:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn-select:active {
+            transform: translateY(0);
+        }
+
+        .btn-select.paint { background: var(--paint); }
+        .btn-select.item { background: var(--item); }
+        .btn-select.stamp { background: var(--stamp); }
+
+        /* Main Action Buttons */
+        .action-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 20px;
+        }
+        .btn-main {
+            padding: 14px 20px;
+            border: none;
+            border-radius: 14px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-main::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--gradient-2);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: -1;
+        }
+
+        .btn-main:hover::before {
+            opacity: 1;
+        }
+
+        .btn-main:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+        }
+
+        .btn-main:active {
+            transform: translateY(-1px);
+        }
+
+        .btn-main:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        .btn-download {             background: var(--success); 
+            grid-column: span 2;
+        }
+        .btn-test { background: var(--accent); }
+        .btn-reset { background: var(--error); }
+
+        /* Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(8px);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal {
+            background: var(--bg-card);
+            border: 1px solid var(--glass-border);
+            width: 100%;
+            max-width: 450px;
+            max-height: 85vh;
+            border-radius: 24px;
+            display: flex;
+            flex-direction: column;
+            animation: slideIn 0.4s ease;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
+        }
+
+        .modal-header {
+            padding: 18px 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--bg-secondary);
+        }
+
+        .modal-title {
+            font-weight: 600;
+            font-size: 1.1rem;
+            display: flex;            align-items: center;
+            gap: 8px;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 1.4rem;
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+            line-height: 1;
+        }
+
+        .modal-close:hover {
+            background: var(--error);
+            color: white;
+            transform: rotate(90deg);
+        }
+
+        .modal-search {
+            padding: 12px 20px;
+            border-bottom: 1px solid var(--border);
+            background: var(--bg-secondary);
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 10px 14px;
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            color: var(--text-primary);
+            font-size: 0.9rem;
+            outline: none;
+        }
+
+        .search-input:focus {
+            border-color: var(--accent);
+        }
+
+        .modal-categories {
+            display: flex;
+            gap: 8px;
+            padding: 12px 20px;
+            border-bottom: 1px solid var(--border);
+            overflow-x: auto;
+            background: var(--bg-secondary);            scrollbar-width: none;
+        }
+
+        .modal-categories::-webkit-scrollbar {
+            display: none;
+        }
+
+        .category-chip {
+            padding: 6px 14px;
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.2s ease;
+        }
+
+        .category-chip:hover, .category-chip.active {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: white;
+        }
+
+        .modal-list {
+            overflow-y: auto;
+            padding: 8px;
+            flex-grow: 1;
+            scrollbar-width: thin;
+            scrollbar-color: var(--border) transparent;
+        }
+
+        .modal-list::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .modal-list::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .modal-list::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 3px;
+        }
+
+        .list-item {
+            padding: 12px 16px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .list-item:hover {
+            background: rgba(99, 102, 241, 0.15);
+            transform: translateX(4px);
+        }
+
+        .list-item.selected {
+            background: var(--accent);
+            color: white;
+        }
+
+        .list-item::before {
+            content: '•';
+            font-size: 1.5rem;
+            opacity: 0.6;
+        }
+
+        .list-item.selected::before {
+            content: '✓';
+            opacity: 1;
+        }
+
+        /* Category Toggle */
+        .category-toggle {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            padding: 10px 14px;
+            width: 100%;
+            text-align: left;
+            cursor: pointer;
+            margin-top: 8px;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.2s ease;
+            font-weight: 500;
+        }
+
+        .category-toggle:hover {
+            background: var(--border);
+            border-color: var(--accent);
+        }
+        .category-toggle::after {
+            content: '▾';
+            transition: transform 0.3s ease;
+        }
+
+        .category-toggle.active::after {
+            transform: rotate(180deg);
+        }
+
+        .button-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+            margin-top: 8px;
+            padding: 4px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .button-grid button {
+            padding: 10px;
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-size: 0.8rem;
+            cursor: pointer;
+            text-align: left;
+            transition: all 0.2s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .button-grid button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.4s ease;
+        }
+
+        .button-grid button:hover::before {
+            left: 100%;
+        }
+
+        .button-grid button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);        }
+
+        .button-grid button:active {
+            transform: translateY(0);
+        }
+
+        .btn-paint { background: var(--paint); }
+        .btn-stamp { background: var(--stamp); }
+        .btn-item { background: var(--item); }
+
+        .hidden { display: none !important; }
+        /* Hex Preview */
+        .hex-view {
+            background: var(--bg-primary);
+            padding: 12px;
+            border-radius: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            overflow-x: auto;
+            margin: 10px 0;
+            border: 1px solid var(--border);
+            white-space: pre;
+            line-height: 1.4;
+        }
+
+        /* Debug Info */
+        #debugInfo {
+            background: var(--bg-primary);
+            padding: 14px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            font-family: monospace;
+            white-space: pre-wrap;
+            max-height: 180px;
+            overflow-y: auto;
+            border: 1px solid var(--border);
+            margin-top: 8px;
+            line-height: 1.5;
+        }
+
+        /* Loading Animation */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: var(--accent);
+            animation: spin 1s linear infinite;
+            margin-right: 8px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Responsive */
+        @media (max-width: 480px) {
+            .app-container { padding: 12px; }
+            .header { padding: 16px 12px; }
+            .logo { font-size: 1.5rem; }
+            .card { padding: 16px; border-radius: 16px; }
+            .action-buttons { grid-template-columns: 1fr; }
+            .btn-download { grid-column: span 1; }
+            .button-grid { grid-template-columns: 1fr; }
+        }
+
+        /* Utility Classes */
+        .text-center { text-align: center; }
+        .mt-2 { margin-top: 8px; }
+        .mb-2 { margin-bottom: 8px; }
+        .flex { display: flex; }
+        .items-center { align-items: center; }
+        .justify-between { justify-content: space-between; }
+        .gap-2 { gap: 8px; }
+
+        /* Page Transition */
+        .page-enter {
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+
+        .page-exit {
+            animation: fadeIn 0.3s ease-in reverse forwards;
+        }
+    </style>
+</head>
+<body>
+    <!-- Animated Background -->
+    <div class="bg-animation">
+        <div class="bg-gradient"></div>
+    </div>
+
+    <div class="app-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo">
+                <span>🎮</span>
+                <span>Zyuxski™ Generator</span>
+            </div>
+            <div class="logo-subtitle">Trophy Binary Editor & Field Modifier</div>
+        </header>
+
+        <!-- File Upload Card -->
+        <div class="card" id="uploadCard">
+            <div class="card-title">📁 Load Trophy File</div>
+            <div class="drop-zone" id="dropZone">
+                <div class="drop-zone-icon">⬇️</div>
+                <div class="drop-zone-text">Seret file atau klik untuk memilih</div>
+                <div class="drop-zone-hint">Support: .bin, .dat, .sav, .txt</div>
+            </div>
+            <input type="file" id="fileInput" accept=".bin,.dat,.sav,.txt,*">
+        </div>
+
+        <!-- Status -->
+        <div class="status waiting" id="status">
+            <span>⏳</span>
+            <span>Menunggu file trophy...</span>
+        </div>
+
+        <!-- Fields Container -->
+        <div id="fieldsContainer"></div>
+
+        <!-- Action Buttons -->
+        <div class="action-buttons">
+            <button id="downloadBtn" class="btn-main btn-download" disabled>
+                💾 Download Patched
+            </button>
+            <button id="testBtn" class="btn-main btn-test" disabled>
+                🧪 Test Validator
+            </button>
+            <button id="resetBtn" class="btn-main btn-reset">
+                🔄 Reset All
+            </button>
+        </div>
+
+        <!-- Debug Section -->
+        <div class="card" style="margin-top: 20px;">
+            <div class="card-title">📊 Debug Info</div>
+            <div id="debugInfo">-</div>
+        </div>
+    </div>
+
+    <!-- Catalog Modal -->
+    <div class="modal-overlay" id="catalogModal">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-title" id="modalTitle">🎨 Pilih Nilai</div>
+                <button class="modal-close" onclick="closeModal()">✕</button>
+            </div>
+            <div class="modal-search">
+                <input type="text" class="search-input" id="searchInput" placeholder="🔍 Cari item..." oninput="filterCatalog()">
+            </div>
+            <div class="modal-categories" id="modalCategories"></div>
+            <div class="modal-list" id="catalogList"></div>
+        </div>
+    </div>
+
+    <script>
+        // ==================== DATA CATALOG ====================
+        const PAINT_CATALOG = {
+            "🎨 Warna Dasar": [
+                "Basic Black", "Basic Blue", "Basic Brown", "Basic Cyan", "Basic Green", 
+                "Basic Orange", "Basic Pink", "Basic Purple", "Basic Red", "Basic White", 
+                "Basic Yellow", "Black & Gold", "Ballistic Burgundy", "Banana Bruise", 
+                "Banana Dessert", "Crash-Pad Blue", "Flaming Orange", "Forest Green", 
+                "Glacier", "Gold Leaf", "Hotdog Time", "Industrial Hazard", "Iron & Oak", 
+                "King of Spades", "Lavender Bloom", "Lavender Plum", "Lumberjack", 
+                "Marble White", "Mystic Dawn", "Mystic Dusk", "Nomad Red", "Olive Green", 
+                "Pinewood", "Pumpkin Orange", "Royal Red", "Royal Sage", "Scottish Green", 
+                "Sludge", "Spirit Grey", "Storm Grey", "Titanium Trim", "Utility Red", 
+                "Winter Pastel"
+            ],
+            "🌿 Biome Cobble": [
+                "Biome - Cobble on Desert", "Biome - Cobble on Evergreen", "Biome - Cobble on Grass", 
+                "Biome - Cobble on Ocean", "Biome - Cobble on Sakura", "Biome - Cobble on Snow", 
+                "Biome - Cobble on Swamp", "Biome - Cobble on Woodlands"
+            ],
+            "🌿 Biome Dirt": [
+                "Biome - Dirt on Desert", "Biome - Dirt on Evergreen", "Biome - Dirt on Grass", 
+                "Biome - Dirt on Ocean", "Biome - Dirt on Sakura", "Biome - Dirt on Snow", 
+                "Biome - Dirt on Swamp", "Biome - Dirt on Woodlands"
+            ],
+            "🌿 Biome Slab": [
+                "Biome - Slab on Desert", "Biome - Slab on Evergreen", "Biome - Slab on Grass", 
+                "Biome - Slab on Ocean", "Biome - Slab on Sakura", "Biome - Slab on Snow", 
+                "Biome - Slab on Swamp", "Biome - Slab on Woodlands"
+            ],
+            "⚔️ Weapon": [
+                "Weapon - Ancient", "Weapon - Bone", "Weapon - Chaos", "Weapon - Dark", 
+                "Weapon - Gold", "Weapon - Ice", "Weapon - Magma", "Weapon - Metal", 
+                "Weapon - Meteor", "Weapon - Spirit", "Weapon - Titanium", "Weapon - Uranium"
+            ],
+            "🛠️ Debug": [
+                "Debug - Bad Bonsai", "Debug - Bad Bookshelf", "Debug - Bad Pooltable", 
+                "Debug - Bad Trading Table", "Debug - Boss Chest", "Debug - Clouds", "Debug - Lava", 
+                "Debug - Metal DK", "Debug - Metal V DK", "Debug - Metal", 
+                "Debug - Stone & Gold & Red", "Debug - Stone & Wood", "Debug - Stone Lite", 
+                "Debug - Stone", "Debug - Tan", "Debug - Wood & Blue", "Debug - Wood & Metal & Gold", 
+                "Debug - Wood & Metal", "Debug - Wood DK", "Debug - Wood Mossy", "Debug - Wood"
+            ],
+            "🖼️ Pattern": [
+                "Bloom", "Candycane", "Hotdogs", "Marble", "Mystical", "Navajo", "Plaid", 
+                "Flames", "Forest"
+            ]
+        };
+
+        const ITEM_CATALOG = [
+            "3-day Land Claim", "8-day Land Claim", "Admin Land Claim", "Amber Vein", "Amber", 
+            "Amethyst Crown", "Amethyst Vein", "Amethyst", "Ancient Armor", "Ancient Bazooka", 
+            "Ancient Bones", "Ancient Eldritch Helm", "Ancient Lance", "Ancient Pillars (dark)", 
+            "Ancient Pillars (storm)", "Ancient Pillars", "Ancient Scythe", "Ancient Skull Helm", 
+            "Ancient Sniper", "Ancient SwirlSword", "Anvil", "Arena", "Armor Display", 
+            "Ballistics Bench", "Banana Bruise", "Banana Dessert", "Basic Black", "Basic Blue", 
+            "Basic Brown", "Basic Cyan", "Basic Green", "Basic Orange", "Basic Pink", "Basic Purple", 
+            "Basic Red", "Basic Rug", "Basic White", "Basic Yellow", "Basket", "Bat Stamp", 
+            "Battle Start Pad", "Bed", "Beehive", "Berry Bush", "Berry", "Big Stone Head", 
+            "Big Table", "Birch Tree (Variant 1)", "Birch Tree (Variant 2)", "Black & Gold", 
+            "Black Shell", "Black Wizard Hat", "Blank Canvas", "Blank Record", "Blue Blob", 
+            "Blue Shell", "Blue String Lights", "Blue Torch", "Blue Wizard Hat", "Bone Juice", 
+            "Bones", "Bonsai Tree", "Book", "Bookshelf", "Boss Chest", "Boss Spawner - Mini", 
+            "Boss Spawner - Shindeon", "Boss Spawner - Yandeon", "Bouncy Floor", "Bread Loaf", 
+            "Brown Mushroom", "Bug Meat", "Builder Tools", "Cactus Chunk", "Cactus", "Campfire", 
+            "Candycane", "Castle", "Cauldron", "Cave Basket", "Cave Chest", "Chair", "Chaos Lance", 
+            "Charm Bomb", "Chest", "Circular Rug", "Clouds", "Cobblestone Path", "Coco Loco", 
+            "Coconut", "Coin Hoard", "Coins Stamp", "Coins", "Companion", "Cooked Meat", 
+            "Cotton Plant", "Cotton", "Crafting Table", "Crash-Pad Blue", "Crate", "Creature Nest", 
+            "Crown Stamp", "Crucible", "Custom Statue", "Dark Armor", "Dark Hasta", "Dark MachineGun", 
+            "Dark Scythe", "Dark Shard Vein", "Dark Shard", "Dark Skull Helm", "Dark Sniper", 
+            "Dark Solaris Helm", "Dark SwirlSword", "Dead Companion", "Debug Paint", "DEBUG-1x1-fillempty", 
+            "DEBUG-gem", "DEBUG-happy-header-android", "DEBUG-happy-header-ios", "DEBUG-npc", 
+            "DEBUG-quest-header-equals", "DEBUG-question-mark", "Desert Cave Entrance", "Dirt Path", 
+            "Double Crate", "Dragon Stamp", "Drill", "Dug-up Brown Mushroom", "Dug-up Giant Pumpkin", 
+            "Dug-up Pumpkin", "Dug-up Purple Mushroom", "Dug-up Red Mushroom", "Dug-up Wheat", "Dung", 
+            "Egg Fuser", "Egg Stamp", "Egg", "Emerald Crown", "Emerald Vein", "Emerald", 
+            "Evergreen Cave Entrance", "Evergreen Tree", "Expando Bread", "Fancy Torch", "Fashion Stamp", 
+            "Feather Stamp", "Feathers", "Fireplace", "Fishing Rod", "Fist Stamp", "Flagpole", 
+            "Flaming Orange", "Flower Stamp", "Flowers", "Food Stamp", "Forest Green", "Fossil", 
+            "Fried Egg", "Frozen Pond", "Frozen Tree", "Fur", "Furniture Stamp", "Ghost Stamp", 
+            "Ghoul Stamp", "Giant Brown Mushroom", "Giant Puncher", "Giant Purple Mushroom", 
+            "Giant Red Mushroom", "Glacier", "Gold Armor", "Gold Bar", "Gold Bow", "Gold Chest", 
+            "Gold Cleaver", "Gold Crossbow", "Gold CurveSword", "Gold DoubleSword", "Gold Leaf", 
+            "Gold Ore", "Gold Shell", "Gold Shogun Helm", "Gold Valkyrie Helm", "Gold Vein", 
+            "Goldberry Bush", "GoldBerry", "Grandfather Clock", "Grass Cave Entrance", "Gravestone", 
+            "Green Blob", "Green Shell", "Grey Wizard Hat", "Holiday Lights", "Honeycomb", 
+            "Hot Pepper Plant", "Hot Pepper", "Hotdog Time", "Huge Coin Hoard", "Hunter Rug White", 
+            "Hunter Rug", "Ice Armor", "Ice DoubleSword", "Ice Hasta", "Ice MachineGun", "Ice Menace Helm", 
+            "Ice Musket", "Ice Shard Vein", "Ice Shard", "Ice Solaris Helm", "Ice SwirlSword", "Igloo", 
+            "Industrial Hazard", "Iron & Oak", "Jam", "Karaoke", "Key", "King of Spades", "Lamp Post", 
+            "Large Amber Vein", "Large Amethyst Vein", "Large Black Stalagmite", "Large Dark Shard Vein", 
+            "Large Emerald Vein", "Large Gold Vein", "Large Ice Shard Vein", "Large Metal Vein", 
+            "Large Mossy Tree", "Large Ocean Stalagmite", "Large Ruby Vein", "Large Sapphire Vein", 
+            "Large Silver Vein", "Large Snow Stalagmite", "Large Stone Vein", "Large Titanium Vein", 
+            "Large Uranium Vein", "Large Weapon Display", "Lava", "Lavender Bloom", "Lavender Bush", 
+            "Lavender Plum", "Lavender", "Land Claim - 3 day", "Land Claim - 8 day", "Land Claim - Admin", 
+            "Land Claim - expired", "Lock", "Loom", "Loot Basket", "Loot Chest", "Low Stone Wall", 
+            "Lumberjack", "Magic Bean", "Magma Armor", "Magma Brute Helm", "Magma DoubleSword", 
+            "Magma Flintlock", "Magma Hasta", "Magma Menace Helm", "Magma Musket", "Magma Shovel", 
+            "Magma SwirlSword", "Magmite Ore", "Magmite Vein", "Mansion", "Marble White", "Matcha", 
+            "Merchant Sign", "Metal Armor", "Metal Bar", "Metal Boomerang", "Metal Chair", "Metal Cleaver", 
+            "Metal DoubleDagger", "Metal Helmet", "Metal Lamp Post", "Metal Legion Helm", "Metal Ore", 
+            "Metal Pick", "Metal Slingshot", "Metal Sword", "Metal Vein", "Meteor Lance", "Mob - Bandit", 
+            "Mob - BANDIT_FACTION Boss", "Mob - BANDIT_FACTION Stronger", "Mob - BANDIT_FACTION Weak", 
+            "Mob - Big", "Mob - Elite Bandit", "Mob - Giant", "Mob - Guardian Hound", "Mob - Normal", 
+            "Mob - Ratroach", "Mob - STORM_FACTION Boss", "Mob - STORM_FACTION Stronger", "Mob - STORM_FACTION Weak", 
+            "Mob - Tiny", "Mob - Vengeful Spirit", "MoonBerry Bush", "Moonberry Juice", "MoonBerry", 
+            "Mossy Tree", "Muffin", "Mushroom Stew", "Music Box", "Mystic Dawn", "Mystic Dusk", "Navpost", 
+            "Nomad Red", "Nut", "Ocean Cave Entrance", "Old Land Claim", "Old Torch", "Olive Green", 
+            "Oven", "Paint Mixer", "Paint Shaker", "Paint Thinner", "Paintbrush Dual", "Paintbrush Single", 
+            "Painting Easel", "Painting", "Palisade Wall", "Palm Tree", "Park Bench", "Party Hat", 
+            "Paw Stamp", "Personal Mine", "Pinewood", "Pocket World Basement", "Pocket World Evergreen", 
+            "Pocket World Snow", "Poison Spikes", "Pond", "Pool Table", "Pop-up Saw", "Potion Stamp", 
+            "Pumpkin Orange", "Pumpkin Pie", "Pumpkin", "Purple Mushroom", "Purple Shell", "Purple Wizard Hat", 
+            "Red Blob", "Red Curry", "Red Mushroom", "Red Shell", "Red String Lights", "Red Torch", 
+            "Rotting Stump", "Royal Red", "Royal Sage", "Ruby Crown", "Ruby Vein", "Ruby", "Rushers", 
+            "Sakura Pond", "Sakura Tree", "Salmonberry Bush", "Salmonberry Scone", "SalmonBerry", 
+            "Sapphire Crown", "Sapphire Vein", "Sapphire", "Saved Record", "Scales", "Scottish Green", 
+            "Shack", "Sharp Tooth", "Shovel", "Sign", "Silk", "Silver Vein", "Silver", "Skull Stamp", 
+            "Sky Chest", "Sludge", "Small Black Stalagmite", "Small Ocean Stalagmite", "Small Snow Stalagmite", 
+            "Small Table", "Snow Cave Entrance", "Snowball", "Snowflake Stamp", "Snowman", "Sofa Chair", 
+            "Sombrero", "Spawner - Ancient Bones", "Spawner - Black Shells", "Spawner - Blue Shells", 
+            "Spawner - Bones", "Spawner - Coconuts", "Spawner - Dung", "Spawner - Fossils", 
+            "Spawner - Gold Shells", "Spawner - Green Shells", "Spawner - Nuts", "Spawner - Purple Shells", 
+            "Spawner - Red Shells", "Spawner - Snowballs", "Spawner - Spirit Branch", "Spawner - Sticks", 
+            "Spawner - White Shells", "Speed Helm", "Spiderhive", "Spirit Armor", "Spirit Bazooka", 
+            "Spirit Branch", "Spirit Eldritch Helm", "Spirit Grey", "Spirit Lance", "Spirit Scythe", 
+            "Spirit Tree", "Spirit Trident", "Spooky Well", "Stamp Maker", "Stamp", "Stick", 
+            "Stone Bricks", "Stone DoubleDagger", "Stone Lantern", "Stone Ore", "Stone Pick", 
+            "Stone Pickaxe-Boomerang", "Stone Sword", "Stone Vein (Desert)", "Stone Vein (Ocean)", 
+            "Stone Vein (Sakura)", "Stone Vein (Snowy)", "Stone Vein (White)", "Stone Vein", "Storm Grey", 
+            "Storm Robes", "Storm Wizard Hat", "String Lights", "Stump Chair", "Sun Stamp", "Super Carrot", 
+            "Super Jam", "Super Top Hat", "Super White Top Hat", "Swamp Cave Entrance", "Swords Stamp", 
+            "Tall Stone Wall", "Tar Pit", "Tea Leaves", "Tea Tree", "Teleporter", "Temple", "Tent", 
+            "Throne", "Titanium Armor", "Titanium Bar", "Titanium Boomerang", "Titanium Bow", 
+            "Titanium Chest", "Titanium Cleaver", "Titanium CurveSword", "Titanium DoubleDagger", 
+            "Titanium Legion Helm", "Titanium Ore", "Titanium Pick", "Titanium Shovel", "Titanium Trim", 
+            "Titanium Valkyrie Helm", "Titanium Vein (Sakura)", "Titanium Vein", "Toasted Nuts", "Top Hat", 
+            "Torch", "Trading Table", "Trophy", "Uncooked Meat", "Underground Room", "Upstairs Room", 
+            "Uranium Armor", "Uranium Bar", "Uranium Brute Helm", "Uranium Crossbow", "Uranium CurveSword", 
+            "Uranium DoubleSword", "Uranium Flintlock", "Uranium Hasta", "Uranium Ore", "Uranium Shogun Helm", 
+            "Uranium Vein", "Utility Red", "Vending Machine", "Venom", "Warehouse", "Weapon Display", 
+            "Wheat", "White Shell", "White Top Hat", "White Wizard Hat", "Willow Tree", "Windmill", 
+            "Winter Pastel", "Wisdom Chest", "Wizard Hat", "Wood Armor", "Wood Helmet", "Wood Pick", 
+            "Wood Rails", "Wood Slingshot", "Wooden Gate"
+        ];
+
+        const STAMP_LIST = [
+            "Bat Stamp", "Coins Stamp", "Crown Stamp", "Dragon Stamp", "Egg Stamp", 
+            "Fashion Stamp", "Feather Stamp", "Fist Stamp", "Flower Stamp", "Food Stamp", 
+            "Furniture Stamp", "Ghost Stamp", "Ghoul Stamp", "Paw Stamp", "Potion Stamp", 
+            "Skull Stamp", "Snowflake Stamp", "Spider Stamp", "Sun Stamp", "Swords Stamp"
+        ];
+
+        const FIELD_LABELS = [
+            "🏆 Trophy Name", "📝 Trophy Reason", "🎨 Trophy Paint",
+            "👤 Trophy From", "🎁 Trophy For", "📅 Trophy Date",
+            "🔐 Auto Validator", "📦 Item ID", "🏷️ Stamp"
+        ];
+
+        // ==================== GLOBAL VARIABLES ====================
+        let originalBuffer = null;
+        let fileName = "";
+        let fieldMeta = [];
+        let currentEditing = null;
+        let catalogType = null;
+        let filteredItems = [];
+        // ==================== MARKERS ====================
+        const MARKER_KEY = new Uint8Array([0x5f, 0x00, 0x6b, 0x00, 0x65, 0x00, 0x79, 0x00]);
+        const MARKER_VALUE = new Uint8Array([0x5f, 0x00, 0x76, 0x00, 0x61, 0x00, 0x6c, 0x00, 0x75, 0x00, 0x65, 0x00]);
+
+        // ==================== UTILITY FUNCTIONS ====================
+        function utf16LeToStr(arr, start, length) {
+            let result = '';
+            for (let i = 0; i < length && (start + i * 2 + 1) < arr.length; i++) {
+                const charCode = arr[start + i * 2] | (arr[start + i * 2 + 1] << 8);
+                if (charCode === 0) break;
+                result += String.fromCharCode(charCode);
+            }
+            return result;
+        }
+
+        function strToUtf16Le(str) {
+            const bytes = new Uint8Array(str.length * 2);
+            for (let i = 0; i < str.length; i++) {
+                const code = str.charCodeAt(i);
+                bytes[i * 2] = code & 0xFF;
+                bytes[i * 2 + 1] = (code >> 8) & 0xFF;
+            }
+            return bytes;
+        }
+
+        function toHexByte(num) {
+            return Math.min(num, 255).toString(16).toUpperCase().padStart(2, '0');
+        }
+
+        function calcValidator() {
+            const vals = [];
+            for (let i = 1; i <= 6; i++) {
+                const el = document.getElementById(`field${i}`);
+                if (el) vals.push(el.value || "");
+            }
+            let charSum = 0;
+            vals.forEach(field => {
+                for (let c of field) {
+                    charSum += c.charCodeAt(0);
+                }
+            });
+            const sumStr = charSum.toString();
+            let validator = '';
+            for (let digit of sumStr) {
+                validator += String.fromCharCode(parseInt(digit) + 97);
+            }
+            return validator;
+        }
+
+        function updateHexSize(id) {
+            const el = document.getElementById(`field${id}`);
+            if (!el) return;
+            const val = el.value;
+            const hex = toHexByte(val.length * 2);
+            const hexEl = document.getElementById(`hex-${id}`);
+            if (hexEl) hexEl.textContent = `[${hex}]`;
+            
+            if (id <= 6) updateValidator();
+        }
+
+        function updateValidator() {
+            const val = calcValidator();
+            const el = document.getElementById('field7');
+            if (el) {
+                el.value = val;
+                updateHexSize(7);
+            }
+        }
+
+        function findMarker(arr, marker, startOffset) {
+            for (let i = startOffset; i <= arr.length - marker.length; i++) {
+                let match = true;
+                for (let j = 0; j < marker.length; j++) {
+                    if (arr[i + j] !== marker[j]) { match = false; break; }
+                }
+                if (match) return i;
+            }
+            return -1;
+        }
+
+        // ==================== UI GENERATION ====================
+        function createInputField(id, isValidator, isPaint, isItem, isStamp) {
+            let extraHTML = '';
+            let typeClass = 'text';
+            let btnClass = '';
+            let btnText = '';
+            let btnIcon = '';
+
+            if (isPaint) {
+                typeClass = 'paint';
+                btnClass = 'paint';
+                btnText = 'Pilih Paint';
+                btnIcon = '🎨';
+                extraHTML = createCatalogButtons('paint', id);
+            } else if (isItem) {
+                typeClass = 'item';
+                btnClass = 'item';
+                btnText = 'Pilih Item';
+                btnIcon = '📦';
+                extraHTML = createCatalogButton('item', id);
+            } else if (isStamp) {
+                typeClass = 'stamp';
+                btnClass = 'stamp';
+                btnText = 'Pilih Stamp';
+                btnIcon = '🏷️';
+                extraHTML = createCatalogButton('stamp', id);
+            }
+
+            return `
+                <div class="field-group" style="animation-delay: ${id * 0.05}s">
+                    <div class="field-header">
+                        <div class="field-label">
+                            <span>${FIELD_LABELS[id-1]}</span>
+                            <span class="field-type ${typeClass}">${isPaint ? 'PAINT' : isItem ? 'ITEM' : isStamp ? 'STAMP' : 'TEXT'}</span>
+                        </div>
+                        <span class="hex-tag" id="hex-${id}">[00]</span>
+                    </div>
+                    <div class="field-key" id="key-${id}"></div>
+                    <input type="text" id="field${id}" class="field-input" 
+                           ${isValidator ? 'readonly' : ''} 
+                           placeholder="Enter value..." 
+                           oninput="handleInput(${id})">
+                    ${isPaint || isItem || isStamp ? `
+                        <button class="btn-select ${btnClass}" onclick="openCatalog('${isPaint ? 'paint' : isItem ? 'item' : 'stamp'}', ${id})">
+                            ${btnIcon} ${btnText}
+                        </button>
+                    ` : ''}
+                    ${extraHTML}
+                </div>
+            `;
+        }
+
+        function createCatalogButton(type, fieldId) {
+            return `<button class="btn-select ${type}" onclick="openCatalog('${type}', ${fieldId})" style="margin-top:10px">🔍 Browse Catalog</button>`;
+        }
+
+        function createCatalogButtons(type, fieldId) {
+            if (type !== 'paint') return '';
+            
+            let buttonsHTML = '';
+            for (const [category, items] of Object.entries(PAINT_CATALOG)) {
+                const catId = `cat-${category.replace(/[^a-zA-Z0-9]/g, '-')}`;
+                const itemsHTML = items.map(item => 
+                    `<button class="btn-paint" onclick="selectFromCatalog('${item.replace(/'/g, "\\'")}', ${fieldId})">${item}</button>`
+                ).join('');
+                buttonsHTML += `
+                    <button class="category-toggle" onclick="toggleCategory('${catId}', this)">${category}</button>
+                    <div id="${catId}" class="hidden button-grid">${itemsHTML}</div>
+                `;
+            }
+            return `<div style="margin-top:10px">${buttonsHTML}</div>`;
+        }
+
+        function generateUI() {
+            const container = document.getElementById('fieldsContainer');
+            container.innerHTML = '';
+            for (let i = 1; i <= 9; i++) {
+                const isValidator = i === 7;
+                const isStamp = i === 9;
+                const isPaint = i === 3;
+                const isItem = i === 8;
+                container.innerHTML += createInputField(i, isValidator, isPaint, isItem, isStamp);
+            }
+        }
+
+        // ==================== CATALOG FUNCTIONS ====================
+        function openCatalog(type, fieldId) {
+            currentEditing = fieldId;
+            catalogType = type;
+            
+            const modal = document.getElementById('catalogModal');
+            const title = document.getElementById('modalTitle');
+            const categories = document.getElementById('modalCategories');
+            const list = document.getElementById('catalogList');
+            const search = document.getElementById('searchInput');
+            
+            // Set title
+            const titles = { paint: '🎨', item: '📦', stamp: '🏷️' };
+            title.innerHTML = `${titles[type]} Pilih ${type.charAt(0).toUpperCase() + type.slice(1)}`;
+            
+            // Setup categories
+            categories.innerHTML = '';
+            if (type === 'paint') {
+                Object.keys(PAINT_CATALOG).forEach((cat, idx) => {
+                    const chip = document.createElement('div');
+                    chip.className = `category-chip${idx === 0 ? ' active' : ''}`;
+                    chip.textContent = cat.split(' ')[0];
+                    chip.onclick = () => filterByCategory(cat);
+                    categories.appendChild(chip);
+                });
+            }
+            
+            // Setup search
+            search.value = '';
+            search.oninput = filterCatalog;
+            
+            // Load items
+            loadCatalogItems(type);
+            
+            // Show modal with animation
+            modal.style.display = 'flex';
+            setTimeout(() => {
+                modal.style.opacity = '1';
+            }, 10);
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('catalogModal');
+            modal.style.opacity = '0';
+            setTimeout(() => {
+                modal.style.display = 'none';
+                currentEditing = null;
+                catalogType = null;
+            }, 300);
+        }
+
+        function loadCatalogItems(type, category = null) {
+            const list = document.getElementById('catalogList');
+            list.innerHTML = '';
+            
+            let items = [];
+            if (type === 'paint') {
+                if (category) {
+                    items = PAINT_CATALOG[category] || [];
+                } else {
+                    items = Object.values(PAINT_CATALOG).flat();
+                }
+            } else if (type === 'item') {
+                items = ITEM_CATALOG;
+            } else if (type === 'stamp') {
+                items = STAMP_LIST;
+            }
+            
+            filteredItems = [...items];
+            renderCatalogItems(items, type);
+        }
+
+        function renderCatalogItems(items, type) {
+            const list = document.getElementById('catalogList');
+            list.innerHTML = '';
+            
+            if (items.length === 0) {
+                list.innerHTML = '<div style="padding:20px;text-align:center;color:var(--text-secondary)">Tidak ada item ditemukan</div>';
+                return;
+            }
+            
+            const currentValue = document.getElementById(`field${currentEditing}`)?.value || '';
+            
+            items.forEach(item => {
+                const div = document.createElement('div');
+                div.className = `list-item${item === currentValue ? ' selected' : ''}`;
+                div.textContent = item;
+                div.onclick = () => selectFromCatalog(item, currentEditing);
+                list.appendChild(div);
+            });
+        }
+
+        function filterCatalog() {
+            const search = document.getElementById('searchInput').value.toLowerCase();
+            const filtered = filteredItems.filter(item => 
+                item.toLowerCase().includes(search)
+            );
+            renderCatalogItems(filtered, catalogType);
+        }
+
+        function filterByCategory(category) {
+            // Update active chip
+            document.querySelectorAll('.category-chip').forEach(chip => {
+                chip.classList.remove('active');
+                if (chip.textContent === category.split(' ')[0]) {
+                    chip.classList.add('active');
+                }
+            });
+            loadCatalogItems('paint', category);
+        }
+
+        function selectFromCatalog(value, fieldId) {
+            const input = document.getElementById(`field${fieldId}`);
+            if (input) {
+                input.value = value;
+                handleInput(fieldId);
+                // Smooth scroll to field
+                input.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+            closeModal();
+        }
+
+        function toggleCategory(id, btn) {
+            const el = document.getElementById(id);
+            if (el) {
+                el.classList.toggle('hidden');
+                btn.classList.toggle('active');
+            }
+        }
+        // ==================== FILE HANDLING ====================
+        function setupFileHandling() {
+            const dropZone = document.getElementById('dropZone');
+            const fileInput = document.getElementById('fileInput');
+            
+            dropZone.addEventListener('click', () => fileInput.click());
+            
+            ['dragenter', 'dragover'].forEach(evt => {
+                dropZone.addEventListener(evt, (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    dropZone.classList.add('dragover');
+                });
+            });
+            
+            ['dragleave', 'drop'].forEach(evt => {
+                dropZone.addEventListener(evt, (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    dropZone.classList.remove('dragover');
+                });
+            });
+            
+            dropZone.addEventListener('drop', (e) => {
+                const file = e.dataTransfer.files[0];
+                if (file) loadFile(file);
+            });
+            
+            fileInput.addEventListener('change', (e) => {
+                if (e.target.files[0]) loadFile(e.target.files[0]);
+            });
+        }
+
+        function loadFile(file) {
+            fileName = file.name;
+            updateStatus(`📂 Membaca: ${file.name}...`, 'waiting');
+            
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    originalBuffer = new Uint8Array(e.target.result);
+                    parseBinary(originalBuffer);
+                } catch (err) {
+                    updateStatus(`❌ ${err.message}`, 'error');
+                }
+            };
+            reader.onerror = () => {
+                updateStatus('❌ Gagal membaca file', 'error');
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        function parseBinary(buffer) {
+            fieldMeta = [];
+            let offset = 0;
+            let debugLog = `=== FILE ANALYSIS ===\nFile: ${fileName}\nSize: ${buffer.length} bytes\n\n`;
+            let fieldCount = 0;
+            
+            while (offset < buffer.length - 20 && fieldCount < 9) {
+                const keyOffset = findMarker(buffer, MARKER_KEY, offset);
+                if (keyOffset === -1) break;
+                
+                const keyLenOffset = keyOffset + MARKER_KEY.length;
+                const keyLen = buffer[keyLenOffset] | (buffer[keyLenOffset + 1] << 8);
+                const keyNameOffset = keyLenOffset + 2;
+                const keyName = utf16LeToStr(buffer, keyNameOffset, keyLen / 2);
+                
+                const afterKeyName = keyNameOffset + keyLen;
+                if (buffer[afterKeyName] !== 0x28) {
+                    offset = keyOffset + 1;
+                    continue;
+                }
+                
+                let valueOffset = -1;
+                for (let i = afterKeyName + 1; i < buffer.length - MARKER_VALUE.length; i++) {
+                    let match = true;
+                    for (let j = 0; j < MARKER_VALUE.length; j++) {
+                        if (buffer[i + j] !== MARKER_VALUE[j]) { match = false; break; }
+                    }
+                    if (match) { valueOffset = i; break; }
+                }
+                
+                if (valueOffset === -1) {
+                    offset = keyOffset + 1;
+                    continue;
+                }
+                
+                const valueLenOffset = valueOffset + MARKER_VALUE.length;
+                const valueLen = buffer[valueLenOffset] | (buffer[valueLenOffset + 1] << 8);
+                const valueStrOffset = valueLenOffset + 2;
+                const valueStr = utf16LeToStr(buffer, valueStrOffset, valueLen / 2);
+                
+                debugLog += `Field ${fieldCount + 1}: "${keyName}" = "${valueStr}"\n`;
+                
+                fieldMeta.push({
+                    id: fieldCount + 1,
+                    valueLenOffset, 
+                    valueStrOffset, 
+                    valueLen, 
+                    valueStr,
+                    keyName
+                });
+                
+                fieldCount++;
+                offset = valueStrOffset + valueLen + 1;
+            }
+
+            if (fieldCount < 1) {
+                throw new Error('Tidak ditemukan field yang valid dalam file.');
+            }
+
+            generateUI();
+            
+            for (const meta of fieldMeta) {
+                const keyEl = document.getElementById(`key-${meta.id}`);
+                const valEl = document.getElementById(`field${meta.id}`);
+                
+                if (keyEl) keyEl.textContent = `Key: ${meta.keyName || 'N/A'}`;
+                if (valEl) {
+                    valEl.value = meta.valueStr;
+                    updateHexSize(meta.id);
+                }
+            }
+            
+            updateValidator();
+            updateStatus(`✅ ${fieldCount} fields loaded from ${fileName}`, 'success');
+            document.getElementById('downloadBtn').disabled = false;
+            document.getElementById('testBtn').disabled = false;
+            document.getElementById('debugInfo').textContent = debugLog;
+        }
+
+        // ==================== ACTION HANDLERS ====================
+        function handleInput(id) {
+            updateHexSize(id);
+        }
+
+        function updateStatus(message, type) {
+            const status = document.getElementById('status');
+            status.className = `status ${type}`;
+            status.innerHTML = `<span>${type === 'waiting' ? '⏳' : type === 'success' ? '✅' : '❌'}</span><span>${message}</span>`;
+        }
+
+        function downloadFile() {
+            if (!originalBuffer) return;
+            
+            const patched = new Uint8Array(originalBuffer);
+            let warnings = [];
+
+            for (const meta of fieldMeta) {
+                const inputEl = document.getElementById(`field${meta.id}`);
+                if (!inputEl) continue;
+                
+                const newVal = inputEl.value;
+                const newLenBytes = newVal.length * 2;
+
+                if (newLenBytes > 255) warnings.push(`⚠️ Field ${meta.id} terlalu panjang!`);
+
+                patched[meta.valueLenOffset] = newLenBytes & 0xFF;
+                patched[meta.valueLenOffset + 1] = (newLenBytes >> 8) & 0xFF;
+
+                const newBytes = strToUtf16Le(newVal);
+                for (let j = 0; j < newBytes.length; j++) {
+                    if (meta.valueStrOffset + j < patched.length) {
+                        patched[meta.valueStrOffset + j] = newBytes[j];
+                    }
+                }
+                
+                const padStart = meta.valueStrOffset + newBytes.length;
+                const padEnd = meta.valueStrOffset + meta.valueLen;
+                for (let j = padStart; j < padEnd && j < patched.length; j++) {
+                    patched[j] = 0x00;
+                }
+            }
+
+            if (warnings.length > 0) {
+                alert(warnings.join('\n'));
+            }
+
+            const blob = new Blob([patched], { type: 'application/octet-stream' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `zyuxski_patched_${Date.now()}.bin`;
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            URL.revokeObjectURL(url);
+            
+            updateStatus('✅ File berhasil di-download! 🎉', 'success');
+            
+            // Celebration animation
+            celebrate();
+        }
+
+        function testValidator() {
+            const validator = calcValidator();
+            let sum = 0;
+            for (let i = 1; i <= 6; i++) {
+                const el = document.getElementById(`field${i}`);
+                if (el) for (let c of el.value) sum += c.charCodeAt(0);
+            }
+            alert(`🔐 Validator Result:\n\nValue: "${validator}"\nCharacter Sum: ${sum}\n\nStatus: ${validator.length > 0 ? '✅ Valid' : '❌ Empty'}`);
+        }
+
+        function resetAll() {
+            if (confirm('Reset semua perubahan?')) {
+                location.reload();
+            }
+        }
+
+        function celebrate() {
+            // Simple celebration effect
+            const colors = ['#6366f1', '#8b5cf6', '#d946ef', '#3b82f6', '#06b6d4'];
+            for (let i = 0; i < 30; i++) {
+                setTimeout(() => {
+                    const particle = document.createElement('div');
+                    particle.className = 'particle';
+                    particle.style.left = Math.random() * 100 + '%';
+                    particle.style.bottom = '0';
+                    particle.style.background = colors[Math.floor(Math.random() * colors.length)];
+                    particle.style.animationDuration = (Math.random() * 2 + 2) + 's';
+                    document.querySelector('.bg-animation').appendChild(particle);
+                    setTimeout(() => particle.remove(), 4000);
+                }, i * 50);
+            }
+        }
+
+        function createParticles() {
+            const container = document.querySelector('.bg-animation');
+            for (let i = 0; i < 20; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.top = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 5 + 's';
+                particle.style.animationDuration = (Math.random() * 10 + 10) + 's';
+                container.appendChild(particle);
+            }
+        }
+
+        // ==================== INITIALIZATION ====================
+        function init() {
+            // Create background particles
+            createParticles();
+            
+            // Setup file handling
+            setupFileHandling();
+            
+            // Generate initial UI
+            generateUI();
+            
+            // Setup event listeners
+            document.getElementById('downloadBtn').addEventListener('click', downloadFile);
+            document.getElementById('testBtn').addEventListener('click', testValidator);
+            document.getElementById('resetBtn').addEventListener('click', resetAll);
+            
+            // Close modal on overlay click
+            document.getElementById('catalogModal').addEventListener('click', (e) => {
+                if (e.target.id === 'catalogModal') closeModal();
+            });
+            
+            // Keyboard support
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') closeModal();
+            });
+        }
+
+        // Start the app
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
