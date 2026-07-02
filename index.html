@@ -3,48 +3,192 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Akses Kamera HTML</title>
+    <title>Deteksi Gestur Tangan & Suara</title>
     <style>
-        body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; }
-        video { 
-            width: 100%; 
-            max-width: 500px; 
-            border: 3px solid #333; 
-            border-radius: 10px;
-            background-color: #000;
+        body { font-family: Arial, sans-serif; text-align: center; background: #1e1e1e; color: white; margin: 0; padding: 20px; }
+        h2 { color: #4CAF50; }
+        video { display: none; } /* Sembunyikan video asli */
+        canvas { 
+            border: 3px solid #4CAF50; 
+            border-radius: 10px; 
+            max-width: 100%; 
+            width: 640px; 
+            height: 480px;
+            background: #000;
         }
-        .pesan { margin-top: 15px; font-weight: bold; }
-        .error { color: red; }
-        .success { color: green; }
+        #status { font-size: 1.2em; margin: 15px 0; color: #ff9800; font-weight: bold; }
+        #hasilGestur { 
+            font-size: 2.5em; 
+            font-weight: bold; 
+            margin-top: 20px; 
+            color: #00bcd4;
+            text-shadow: 0 0 10px rgba(0, 188, 212, 0.5);
+        }
     </style>
 </head>
 <body>
 
-    <h2>Tes Akses Kamera</h2>
-    <!-- Elemen video untuk menampilkan hasil kamera -->
+    <h2>🖐️ Tes Deteksi Gestur Tangan</h2>
+    <p id="status">Memuat AI MediaPipe... Mohon tunggu.</p>
+    
+    <!-- Elemen Video (Disembunyikan) -->
     <video id="videoKamera" autoplay playsinline></video>
-    <p id="statusPesan" class="pesan">Menunggu izin kamera...</p>
+    <!-- Canvas untuk menggambar kerangka tangan -->
+    <canvas id="canvasOutput" width="640" height="480"></canvas>
+    
+    <div id="hasilGestur">Belum ada gestur terdeteksi</div>
 
-    <script>
-        // Mengambil elemen video dan pesan dari HTML
-        const video = document.getElementById('videoKamera');
-        const pesan = document.getElementById('statusPesan');
+    <script type="module">
+        // 1. Import Library MediaPipe dari CDN Google
+        import { GestureRecognizer, FilesetResolver, DrawingUtils } from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest";
 
-        // Meminta izin akses kamera menggunakan API
-        navigator.mediaDevices.getUserMedia({ video: true, audio: false })
-            .then(function(stream) {
-                // Jika pengguna mengklik "Izinkan", tampilkan video ke elemen <video>
-                video.srcObject = stream;
-                pesan.className = "pesan success";
-                pesan.innerText = "Berhasil! Kamera aktif.";
-            })
-            .catch(function(error) {
-                // Jika pengguna mengklik "Blokir" atau terjadi error
-                pesan.className = "pesan error";
-                pesan.innerText = "Gagal mengakses kamera. Pastikan Anda mengizinkan akses dan menggunakan HTTPS.";
-                console.error("Error kamera: ", error);
+        const video = document.getElementById("videoKamera");
+        const canvas = document.getElementById("canvasOutput");
+        const ctx = canvas.getContext("2d");
+        const statusEl = document.getElementById("status");
+        const hasilEl = document.getElementById("hasilGestur");
+
+        let gestureRecognizer;
+        let runningMode = "IMAGE";
+        let lastGesture = ""; // Untuk mencegah suara berbunyi terus-menerus (spam)
+        let webcamRunning = false;
+
+        // 2. Inisialisasi AI MediaPipe
+        async function createGestureRecognizer() {
+            const vision = await FilesetResolver.forVisionTasks(
+                "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest/wasm"
+            );
+            gestureRecognizer = await GestureRecognizer.createFromOptions(vision, {
+                baseOptions: {
+                    modelAssetPath: "https://storage.googleapis.com/mediapipe-models/gesture_recognizer/gesture_recognizer/float16/1/gesture_recognizer.task",
+                    delegate: "GPU"
+                },
+                runningMode: "VIDEO",
+                numHands: 1 // Cukup deteksi 1 tangan saja biar ringan
             });
-    </script>
+            enableCam();
+        }
 
+        // 3. Nyalakan Kamera
+        async function enableCam() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ 
+                    video: { facingMode: "user", width: 640, height: 480 } 
+                });
+                video.srcObject = stream;
+                video.addEventListener("loadeddata", predictWebcam);
+                statusEl.innerText = "Kamera Aktif! Coba tunjukkan tanganmu ke kamera.";
+                statusEl.style.color = "#4CAF50";
+                webcamRunning = true;
+            } catch (err) {
+                statusEl.innerText = "Gagal mengakses kamera. Pastikan izin diberikan & pakai HTTPS/localhost.";
+                statusEl.style.color = "red";
+            }
+        }
+
+        // 4. Fungsi Utama: Looping Deteksi Gestur
+        async function predictWebcam() {
+            if (!webcamRunning) return;
+
+            if (video.readyState >= 2) {
+                let startTimeMs = performance.now();
+                
+                // Deteksi gestur
+                const result = gestureRecognizer.recognizeForVideo(video, startTimeMs);
+
+                // Bersihkan canvas
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                if (result.gestures.length > 0) {
+                    // Ambil gestur tangan pertama yang terdeteksi
+                    const gesture = result.gestures[0][0];
+                    const categoryName = gesture.categoryName;
+                    const score = gesture.score;
+
+                    // Gambar kerangka tangan di canvas (Biar keren)
+                    const drawingUtils = new DrawingUtils(ctx);
+                    for (const landmarks of result.landmarks) {
+                        drawingUtils.drawConnectors(landmarks, GestureRecognizer.HAND_CONNECTIONS, { color: "#00FF00", lineWidth: 3 });
+                        drawingUtils.drawLandmarks(landmarks, { color: "#FF0000", lineWidth: 1 });
+                    }
+
+                    // Jika tingkat kepercayaan (score) di atas 70%
+                    if (score > 0.70) {
+                        hasilEl.innerText = formatNamaGestur(categoryName);
+                        
+                        // CEK: Hanya mainkan suara jika gestur BERUBAH (mencegah suara stutter)
+                        if (categoryName !== lastGesture) {
+                            mainkanSuara(categoryName);
+                            lastGesture = categoryName;
+                        }
+                    }
+                } else {
+                    hasilEl.innerText = "Belum ada gestur terdeteksi";
+                    lastGesture = ""; // Reset jika tangan hilang dari frame
+                }
+            }
+            // Looping terus menerus
+            if (webcamRunning) {
+                window.requestAnimationFrame(predictWebcam);
+            }
+        }
+
+        // 5. Fungsi Memainkan Suara (Menggunakan Web Audio API)
+        function mainkanSuara(gestur) {
+            const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+
+            oscillator.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+
+            // Atur nada/frekuensi berdasarkan gestur
+            switch(gestur) {
+                case "Thumb_Up": // Jempol ke atas
+                    oscillator.frequency.value = 800; // Nada tinggi
+                    break;
+                case "Open_Palm": // Telapak tangan terbuka
+                    oscillator.frequency.value = 500; // Nada sedang
+                    break;
+                case "Closed_Fist": // Kepalan tangan
+                    oscillator.frequency.value = 200; // Nada rendah
+                    break;
+                case "Victory": // Tanda Peace / V
+                    oscillator.frequency.value = 650; // Nada unik
+                    break;
+                case "Pointing_Up": // Telunjuk ke atas
+                    oscillator.frequency.value = 1000; // Nada sangat tinggi
+                    break;
+                default:
+                    oscillator.frequency.value = 400;
+            }
+
+            oscillator.type = 'sine';
+            gainNode.gain.setValueAtTime(0.5, audioCtx.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.5); // Fade out 0.5 detik
+
+            oscillator.start(audioCtx.currentTime);
+            oscillator.stop(audioCtx.currentTime + 0.5);
+        }
+
+        // Fungsi helper untuk merapikan nama gestur ke Bahasa Indonesia
+        function formatNamaGestur(name) {
+            const map = {
+                "None": "Tidak Dikenal",
+                "Closed_Fist": "✊ Kepalan Tangan",
+                "Open_Palm": "🖐️ Telapak Terbuka",
+                "Pointing_Up": "☝️ Telunjuk Ke Atas",
+                "Thumb_Down": "👎 Jempol Ke Bawah",
+                "Thumb_Up": "👍 Jempol Ke Atas",
+                "Victory": "✌️ Tanda Peace / V",
+                "ILoveYou": "🤟 I Love You"
+            };
+            return map[name] || name;
+        }
+
+        // Mulai semuanya!
+        createGestureRecognizer();
+
+    </script>
 </body>
 </html>
