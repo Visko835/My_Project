@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Akses Kamera HTML</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; }
+        video { 
+            width: 100%; 
+            max-width: 500px; 
+            border: 3px solid #333; 
+            border-radius: 10px;
+            background-color: #000;
+        }
+        .pesan { margin-top: 15px; font-weight: bold; }
+        .error { color: red; }
+        .success { color: green; }
+    </style>
+</head>
+<body>
+
+    <h2>Tes Akses Kamera</h2>
+    <!-- Elemen video untuk menampilkan hasil kamera -->
+    <video id="videoKamera" autoplay playsinline></video>
+    <p id="statusPesan" class="pesan">Menunggu izin kamera...</p>
+
+    <script>
+        // Mengambil elemen video dan pesan dari HTML
+        const video = document.getElementById('videoKamera');
+        const pesan = document.getElementById('statusPesan');
+
+        // Meminta izin akses kamera menggunakan API
+        navigator.mediaDevices.getUserMedia({ video: true, audio: false })
+            .then(function(stream) {
+                // Jika pengguna mengklik "Izinkan", tampilkan video ke elemen <video>
+                video.srcObject = stream;
+                pesan.className = "pesan success";
+                pesan.innerText = "Berhasil! Kamera aktif.";
+            })
+            .catch(function(error) {
+                // Jika pengguna mengklik "Blokir" atau terjadi error
+                pesan.className = "pesan error";
+                pesan.innerText = "Gagal mengakses kamera. Pastikan Anda mengizinkan akses dan menggunakan HTTPS.";
+                console.error("Error kamera: ", error);
+            });
+    </script>
+
+</body>
+</html>
